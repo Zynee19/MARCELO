@@ -1,7 +1,17 @@
-users = {"admin": "admin123","user":"pass123"}
-username = input("enter username: ")
-password = input("enter password: ")
-if username in users and users[username] == password:
-    print("login successfully")
-    else:
-        print("invalid username or password")
+<?php
+session_start();
+require 'config.php';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST["username"]);
+    $password = $_POST["password"];
+    $stmt = $pdo->prepare("SELECT password FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    $row = $stmt->fetch();
+    if ($row && password_verify($password, $row["password"])) {
+        $_SESSION["user"] = $username;
+        header("Location: dashboard.php");
+    } else {
+        echo "Invalid credentials";
+    }
+}
+?>
